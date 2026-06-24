@@ -1,24 +1,34 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { db } from "@/db";
+import migrations from "@/drizzle/migrations";
+import { queryClient } from "@/lib/query/query-client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { Stack } from "expo-router";
+import { ActivityIndicator } from "react-native";
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
+function DatabaseProvider({ children }: { children: React.ReactNode }) {
+  const { success, error } = useMigrations(db, migrations);
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+  if (error) {
+    console.error("Migration error:", error);
+    return <ActivityIndicator />;
+  }
+
+  if (!success) {
+    return <ActivityIndicator />;
+  }
+
+  return <>{children}</>;
+}
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <DatabaseProvider>
+      <QueryClientProvider client={queryClient}>
+        <Stack>
+          <Stack.Screen name="index" options={{ title: "Home" }} />
+        </Stack>
+      </QueryClientProvider>
+    </DatabaseProvider>
   );
 }
