@@ -1,34 +1,77 @@
-import { db } from "@/db";
-import migrations from "@/drizzle/migrations";
-import { queryClient } from "@/lib/query/query-client";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import { Stack } from "expo-router";
-import { ActivityIndicator } from "react-native";
+import { Tabs } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import "react-native-reanimated";
 
-function DatabaseProvider({ children }: { children: React.ReactNode }) {
-  const { success, error } = useMigrations(db, migrations);
-
-  if (error) {
-    console.error("Migration error:", error);
-    return <ActivityIndicator />;
-  }
-
-  if (!success) {
-    return <ActivityIndicator />;
-  }
-
-  return <>{children}</>;
-}
+import { useTheme } from "@/hooks/use-theme";
+import AppProviders from "@/lib/providers/AppProviders";
+import { ChartColumn, Ellipsis, Route, Settings } from "lucide-react-native";
 
 export default function RootLayout() {
+  const { colors } = useTheme();
+
   return (
-    <DatabaseProvider>
-      <QueryClientProvider client={queryClient}>
-        <Stack>
-          <Stack.Screen name="index" options={{ title: "Home" }} />
-        </Stack>
-      </QueryClientProvider>
-    </DatabaseProvider>
+    <AppProviders>
+      <Tabs
+        screenOptions={{
+          tabBarInactiveTintColor: colors.tabIconDefault,
+          tabBarActiveTintColor: colors.tabIconSelected,
+          tabBarStyle: {
+            backgroundColor: colors.surface,
+            borderTopColor: colors.border,
+            borderTopWidth: 1,
+          },
+
+          sceneStyle: {
+            backgroundColor: colors.background,
+          },
+
+          headerShown: false,
+        }}
+      >
+        <Tabs.Screen
+          name="trips"
+          options={{
+            title: "Trips",
+            tabBarIcon: ({ color, size }) => (
+              <Route color={color} size={size} />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="reports"
+          options={{
+            title: "Reports",
+
+            tabBarIcon: ({ color, size }) => (
+              <ChartColumn color={color} size={size} />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="more"
+          options={{
+            title: "More",
+            popToTopOnBlur: true,
+            tabBarIcon: ({ color, size }) => (
+              <Ellipsis color={color} size={size} />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Settings",
+
+            tabBarIcon: ({ color, size }) => (
+              <Settings color={color} size={size} />
+            ),
+          }}
+        />
+      </Tabs>
+      <StatusBar style="auto" />
+    </AppProviders>
   );
 }
