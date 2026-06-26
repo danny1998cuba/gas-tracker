@@ -1,5 +1,10 @@
 import type { LucideIcon } from "lucide-react-native";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  ViewStyle,
+} from "react-native";
 
 import { useTheme } from "@/hooks/use-theme";
 
@@ -9,6 +14,8 @@ type Props = {
   onPress?: () => void;
 
   disabled?: boolean;
+
+  loading?: boolean;
 
   color?: string;
 
@@ -21,6 +28,7 @@ export function HeaderButton({
   icon: Icon,
   onPress,
   disabled,
+  loading,
   color,
   size = 22,
   style,
@@ -30,7 +38,7 @@ export function HeaderButton({
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || loading}
       hitSlop={10}
       style={({ pressed }) => [
         styles.container,
@@ -40,7 +48,11 @@ export function HeaderButton({
         style,
       ]}
     >
-      <Icon size={size} color={color ?? colors.text} />
+      {loading ? (
+        <ActivityIndicator color="white" size="small" />
+      ) : (
+        <Icon size={size} color={color ?? colors.text} />
+      )}
     </Pressable>
   );
 }

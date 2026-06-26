@@ -9,6 +9,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { PropsWithChildren } from "react";
 import { ActivityIndicator, useColorScheme } from "react-native";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { queryClient } from "../query/query-client";
 
@@ -34,9 +35,11 @@ const AppProviders = ({ children }: PropsWithChildren) => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <DatabaseProvider>
         <SafeAreaProvider>
-          <QueryClientProvider client={queryClient}>
-            {children}
-          </QueryClientProvider>
+          <KeyboardProvider>
+            <QueryClientProvider client={queryClient}>
+              {children}
+            </QueryClientProvider>
+          </KeyboardProvider>
         </SafeAreaProvider>
       </DatabaseProvider>
     </ThemeProvider>

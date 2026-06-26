@@ -16,10 +16,10 @@ import { HeaderTitle } from "./HeaderTitle";
 
 export type HeaderAction = {
   icon: LucideIcon;
-
   onPress?: () => void;
-
   color?: string;
+  loading?: boolean;
+  disabled?: boolean;
 };
 
 type Props = {
