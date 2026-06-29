@@ -1,4 +1,4 @@
-import { MenuCard } from "@/components/cards/MenuCard";
+import { Text } from "@/components/common/ThemedText";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/navigation/AppHeader";
 
@@ -7,7 +7,12 @@ export default function SettingsScreen() {
     <>
       <AppHeader title="Settings" />
       <Screen>
-        <MenuCard
+        <Text
+          style={{ textAlign: "center", paddingVertical: 100, fontSize: 32 }}
+        >
+          Comming soon...
+        </Text>
+        {/* <MenuCard
           title="Preferences"
           onPress={() => {
             //
@@ -40,7 +45,7 @@ export default function SettingsScreen() {
           onPress={() => {
             //
           }}
-        />
+        /> */}
       </Screen>
     </>
   );

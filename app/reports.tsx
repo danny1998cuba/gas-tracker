@@ -1,15 +1,18 @@
-import { StatCard } from "@/components/cards/StatCard";
+import { Text } from "@/components/common/ThemedText";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/navigation/AppHeader";
-import { Section } from "@/components/sections/Section";
-import { View } from "react-native";
 
 export default function ReportsScreen() {
   return (
     <>
       <AppHeader title="Reports" />
       <Screen>
-        <Section title="Dashboard" omitMagin>
+        <Text
+          style={{ textAlign: "center", paddingVertical: 100, fontSize: 32 }}
+        >
+          Comming soon...
+        </Text>
+        {/* <Section title="Dashboard" omitMagin>
           <View
             style={{
               flexDirection: "row",
@@ -27,7 +30,7 @@ export default function ReportsScreen() {
 
         <Section title="By Vehicle" />
 
-        <Section title="By Date" />
+        <Section title="By Date" /> */}
       </Screen>
     </>
   );
