@@ -47,7 +47,8 @@ const service = {
     return repository.findAll();
   },
 
-  getById(id: string) {
+  getById(id?: string) {
+    if (!id) return null;
     return repository.findById(id);
   },
 
@@ -76,10 +77,8 @@ export function useVehicles() {
   });
 }
 
-export function useVehicle(id: string) {
+export function useVehicle(id?: string) {
   return useQuery({
-    enabled: !!id,
-
     queryKey: queryKeys.vehicle(id),
 
     queryFn: () => service.getById(id),

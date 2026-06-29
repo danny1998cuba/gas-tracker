@@ -72,8 +72,6 @@ export function useDrivers() {
 
 export function useDriver(id?: string) {
   return useQuery({
-    // enabled: !!id,
-
     queryKey: queryKeys.driver(id),
 
     queryFn: () => service.getById(id),

@@ -6,7 +6,7 @@ export function clearEmptyStrings<T>(
     return value.map((v) => clearEmptyStrings(v, toSet)) as T;
   }
 
-  if (value !== null && typeof value === "object") {
+  if (value !== null && typeof value === "object" && !(value instanceof Date)) {
     return Object.fromEntries(
       Object.entries(value).map(([key, val]) => [
         key,

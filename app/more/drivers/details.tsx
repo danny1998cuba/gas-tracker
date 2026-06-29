@@ -8,6 +8,7 @@ import { Text } from "@/components/common/ThemedText";
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/navigation/AppHeader";
 
+import DetailsFieldRow from "@/components/common/DetailsFieldRow";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
 import { formatPhone } from "@/components/form/helpers/formatter/phone-number.helper";
 import { useTheme } from "@/hooks/use-theme";
@@ -78,16 +79,19 @@ export default function DriverDetails() {
             },
           ]}
         >
-          <Field label="Name" value={driver.name} />
+          <DetailsFieldRow label="Name" value={driver.name} />
 
-          <Field
+          <DetailsFieldRow
             label="Phone"
             value={driver.phone ? formatPhone(driver.phone) : "-"}
           />
 
-          <Field label="Status" value={driver.active ? "Active" : "Inactive"} />
+          <DetailsFieldRow
+            label="Status"
+            value={driver.active ? "Active" : "Inactive"}
+          />
 
-          <Field label="Notes" value={driver.notes ?? "-"} />
+          <DetailsFieldRow label="Notes" value={driver.notes ?? "-"} />
         </View>
 
         <View
@@ -116,34 +120,6 @@ export default function DriverDetails() {
         }}
       />
     </>
-  );
-}
-
-type FieldProps = {
-  label: string;
-  value: string;
-};
-
-function Field({ label, value }: FieldProps) {
-  const { colors, spacing } = useTheme();
-
-  return (
-    <View
-      style={{
-        marginBottom: spacing.lg,
-      }}
-    >
-      <Text type="textSecondary">{label}</Text>
-
-      <Text
-        style={{
-          marginTop: 4,
-          color: colors.text,
-        }}
-      >
-        {value}
-      </Text>
-    </View>
   );
 }
 

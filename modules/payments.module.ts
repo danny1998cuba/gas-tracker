@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 
-import { payments } from "@/db/schema";
+import { drivers, payments } from "@/db/schema";
 
 import { queryKeys } from "@/lib/query/query-keys";
 
@@ -14,12 +14,20 @@ export type CreatePayment = typeof payments.$inferInsert;
 
 const repository = {
   findAll() {
-    return db.select().from(payments);
+    return db
+      .select({
+        payment: payments,
+
+        driverName: drivers.name,
+      })
+      .from(payments)
+      .innerJoin(drivers, eq(payments.driverId, drivers.id));
   },
 
   findById(id: string) {
     return db.query.payments.findFirst({
       where: eq(payments.id, id),
+      with: { driver: { columns: { name: true } } },
     });
   },
 
@@ -37,7 +45,10 @@ const service = {
     return repository.findAll();
   },
 
-  getById(id: string) {
+  getById(id?: string) {
+    if (!id) {
+      return null;
+    }
     return repository.findById(id);
   },
 
@@ -58,12 +69,9 @@ export function usePayments() {
   });
 }
 
-export function usePayment(id: string) {
+export function usePayment(id?: string) {
   return useQuery({
-    enabled: !!id,
-
     queryKey: queryKeys.payment(id),
-
     queryFn: () => service.getById(id),
   });
 }

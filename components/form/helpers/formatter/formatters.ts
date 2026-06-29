@@ -69,7 +69,7 @@ export const numberFormatter: Formatter<number | null> = {
   mode: "always",
 };
 
-export const currencyFormatter: Formatter<number | null> = {
+export const currencyFormatter: Formatter<number | undefined> = {
   format(value) {
     if (value == null) return "";
 
@@ -81,7 +81,7 @@ export const currencyFormatter: Formatter<number | null> = {
 
     const n = Number(clean);
 
-    return Number.isNaN(n) ? null : n;
+    return Number.isNaN(n) ? undefined : n;
   },
 
   keyboardType: "decimal-pad",
