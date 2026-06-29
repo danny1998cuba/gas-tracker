@@ -1,9 +1,11 @@
-export function calculateTripCost(
+import { TripSummary } from "@/modules/trip.module";
+
+export function calculateTripSummary(
   distanceKm: number,
   fuelEfficiency: number,
   gasPricePerLiter: number,
   payerCount: number,
-) {
+): TripSummary {
   const litersConsumed = (distanceKm * fuelEfficiency) / 100;
 
   const totalCost = litersConsumed * gasPricePerLiter;
@@ -12,9 +14,11 @@ export function calculateTripCost(
 
   return {
     litersConsumed,
-
     totalCost,
-
     amountOwed,
+    costPerKm: totalCost / distanceKm,
+    costPerPassenger: totalCost / payerCount,
+    fuelEfficiency,
+    payerCount,
   };
 }

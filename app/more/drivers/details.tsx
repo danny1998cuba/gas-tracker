@@ -91,6 +91,11 @@ export default function DriverDetails() {
             value={driver.active ? "Active" : "Inactive"}
           />
 
+          <DetailsFieldRow
+            label="Preferred Vehicle"
+            value={driver.vehicle?.name ?? "-"}
+          />
+
           <DetailsFieldRow label="Notes" value={driver.notes ?? "-"} />
         </View>
 

@@ -1,13 +1,15 @@
 import { Text } from "@/components/common/ThemedText";
 import { useTheme } from "@/hooks/use-theme";
 import { PropsWithChildren } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 type Props = PropsWithChildren<{
-  label: string;
+  label?: string;
   required?: boolean;
+  omitMargin?: boolean;
   error?: string;
   helperText?: string;
+  containerStyle?: ViewStyle;
 }>;
 
 export function FormField({
@@ -16,41 +18,48 @@ export function FormField({
   error,
   helperText,
   children,
+  containerStyle,
+  omitMargin = false,
 }: Props) {
   const { spacing, typography } = useTheme();
 
   return (
     <View
       style={{
-        marginBottom: spacing.xl,
+        marginBottom: omitMargin ? undefined : spacing.xl,
       }}
     >
-      <Text
-        style={{
-          fontWeight: "600",
-          fontSize: typography.body,
-        }}
-      >
-        {label}
+      {label && (
+        <Text
+          style={{
+            fontWeight: "600",
+            fontSize: typography.body,
+          }}
+        >
+          {label}
 
-        {required && (
-          <View style={{ paddingStart: spacing.xs }}>
-            <Text type="danger">*</Text>
-          </View>
-        )}
-        {!required && (
-          <View style={{ paddingStart: spacing.xs }}>
-            <Text type="textMuted" style={{ fontSize: typography.overline }}>
-              (optional)
-            </Text>
-          </View>
-        )}
-      </Text>
+          {required && (
+            <View style={{ paddingStart: spacing.xs }}>
+              <Text type="danger">*</Text>
+            </View>
+          )}
+          {!required && (
+            <View style={{ paddingStart: spacing.xs }}>
+              <Text type="textMuted" style={{ fontSize: typography.overline }}>
+                (optional)
+              </Text>
+            </View>
+          )}
+        </Text>
+      )}
 
       <View
-        style={{
-          marginTop: 6,
-        }}
+        style={[
+          containerStyle,
+          {
+            marginTop: 6,
+          },
+        ]}
       >
         {children}
       </View>

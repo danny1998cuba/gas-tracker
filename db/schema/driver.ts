@@ -1,4 +1,5 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { vehicles } from "./vehicle";
 
 export const drivers = sqliteTable("drivers", {
   id: text().primaryKey(),
@@ -10,6 +11,8 @@ export const drivers = sqliteTable("drivers", {
   notes: text(),
 
   active: integer({ mode: "boolean" }).notNull().default(true),
+
+  preferredVehicleId: text().references(() => vehicles.id),
 
   createdAt: integer({
     mode: "timestamp",

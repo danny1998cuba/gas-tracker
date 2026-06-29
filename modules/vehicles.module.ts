@@ -123,6 +123,12 @@ export function useUpdateVehicle() {
       });
 
       qc.invalidateQueries({
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.trips);
+        },
+      });
+
+      qc.invalidateQueries({
         queryKey: queryKeys.vehicle(variables.id),
       });
     },

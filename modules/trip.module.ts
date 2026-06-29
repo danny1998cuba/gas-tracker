@@ -16,11 +16,16 @@ export type UpdateTrip = Partial<CreateTrip>;
 
 export type TripSummary = {
   litersConsumed: number;
-
+  fuelEfficiency: number;
   totalCost: number;
-
   amountOwed: number;
+  costPerPassenger: number;
+  costPerKm: number;
+  payerCount: number;
 };
+
+type TripEntity = Awaited<ReturnType<typeof repository.findById>>;
+export type TripWithSummary = NonNullable<TripEntity> & TripSummary;
 
 function calculateSummary(
   distanceKm: number,
@@ -39,10 +44,12 @@ function calculateSummary(
 
   return {
     litersConsumed,
-
+    fuelEfficiency,
     totalCost,
-
     amountOwed,
+    payerCount,
+    costPerPassenger: amountOwed,
+    costPerKm: totalCost / distanceKm,
   };
 }
 
@@ -52,6 +59,16 @@ const repository = {
       with: {
         driver: true,
 
+        vehicle: true,
+      },
+    });
+  },
+
+  findLastTrip() {
+    return db.query.trips.findFirst({
+      orderBy: (trips, { desc }) => [desc(trips.date)],
+      with: {
+        driver: true,
         vehicle: true,
       },
     });
@@ -127,30 +144,71 @@ const service = {
 
       ...calculateSummary(
         trip.distanceKm,
-
         trip.vehicle.fuelEfficiency,
-
         trip.gasPricePerLiter,
-
         trip.payerCount,
       ),
     }));
   },
 
-  getById(id: string) {
-    return repository.findById(id);
+  async getById(id?: string) {
+    if (!id) return null;
+
+    const trip = await repository.findById(id);
+    if (!trip) return null;
+
+    return {
+      ...trip,
+      ...calculateSummary(
+        trip.distanceKm,
+        trip.vehicle.fuelEfficiency,
+        trip.gasPricePerLiter,
+        trip.payerCount,
+      ),
+    };
   },
 
-  getByDriver(driverId: string) {
-    return repository.findByDriver(driverId);
+  async getLastTrip() {
+    const trip = await repository.findLastTrip();
+    if (!trip) return null;
+
+    return {
+      ...trip,
+      ...calculateSummary(
+        trip.distanceKm,
+        trip.vehicle.fuelEfficiency,
+        trip.gasPricePerLiter,
+        trip.payerCount,
+      ),
+    };
   },
 
-  getByDateRange(
-    from: Date,
+  async getByDriver(driverId: string) {
+    const trips = await repository.findByDriver(driverId);
 
-    to: Date,
-  ) {
-    return repository.findByDateRange(from, to);
+    return trips.map((trip) => ({
+      ...trip,
+      ...calculateSummary(
+        trip.distanceKm,
+        trip.vehicle.fuelEfficiency,
+        trip.gasPricePerLiter,
+        trip.payerCount,
+      ),
+    }));
+  },
+
+  async getByDateRange(from: Date, to: Date) {
+    const trips = await repository.findByDateRange(from, to);
+
+    return trips.map((trip) => ({
+      ...trip,
+      ...calculateSummary(
+        trip.distanceKm,
+        trip.vehicle.fuelEfficiency,
+        trip.gasPricePerLiter,
+        trip.payerCount,
+      ),
+    }));
   },
 
   create(data: CreateTrip) {
@@ -173,18 +231,21 @@ const service = {
 export function useTrips() {
   return useQuery({
     queryKey: queryKeys.trips,
-
     queryFn: () => service.getAll(),
   });
 }
 
-export function useTrip(id: string) {
+export function useTrip(id?: string) {
   return useQuery({
-    enabled: !!id,
-
     queryKey: queryKeys.trip(id),
-
     queryFn: () => service.getById(id),
+  });
+}
+
+export function useLastTrip() {
+  return useQuery({
+    queryKey: [queryKeys.trips, "last"],
+    queryFn: () => service.getLastTrip(),
   });
 }
 
@@ -192,7 +253,7 @@ export function useTripsByDriver(driverId: string) {
   return useQuery({
     enabled: !!driverId,
 
-    queryKey: ["trips", "driver", driverId],
+    queryKey: [queryKeys.trips, "driver", driverId],
 
     queryFn: () => service.getByDriver(driverId),
   });
@@ -204,7 +265,7 @@ export function useTripsByDateRange(
   to: Date,
 ) {
   return useQuery({
-    queryKey: ["trips", from, to],
+    queryKey: [queryKeys.trips, from, to],
 
     queryFn: () => service.getByDateRange(from, to),
   });
@@ -236,7 +297,10 @@ export function useUpdateTrip() {
       id,
 
       data,
-    }: any) => service.update(id, data),
+    }: {
+      id: string;
+      data: UpdateTrip;
+    }) => service.update(id, data),
 
     onSuccess(
       _,

@@ -6,6 +6,7 @@ import { AppHeader } from "@/components/navigation/AppHeader";
 import { useTheme } from "@/hooks/use-theme";
 import { usePayment } from "@/modules/payments.module";
 import { useDeleteVehicle } from "@/modules/vehicles.module";
+import { formatCurrency } from "@/utils/currency.utils";
 import { router, useLocalSearchParams } from "expo-router";
 import { Trash2 } from "lucide-react-native";
 import React, { useState } from "react";
@@ -67,10 +68,7 @@ export default function Details() {
 
           <DetailsFieldRow
             label="Amount"
-            value={Intl.NumberFormat("en-CA", {
-              style: "currency",
-              currency: "CAD",
-            }).format(payment.amount)}
+            value={formatCurrency(payment.amount)}
           />
 
           <DetailsFieldRow

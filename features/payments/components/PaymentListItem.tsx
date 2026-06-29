@@ -6,6 +6,8 @@ import { Text } from "@/components/common/ThemedText";
 
 import { useTheme } from "@/hooks/use-theme";
 import { Payment } from "@/modules/payments.module";
+import { formatCurrency } from "@/utils/currency.utils";
+import { formatDate } from "@/utils/date.utils";
 
 type Props = {
   payment: Payment & { driverName: string };
@@ -47,7 +49,7 @@ export function PaymentListItem({ payment, onPress }: Props) {
           </Text>
 
           <Text type="textSecondary">
-            {payment.paymentDate.toLocaleDateString()}
+            {formatDate(payment.paymentDate, "short")}
           </Text>
         </View>
 
@@ -62,7 +64,7 @@ export function PaymentListItem({ payment, onPress }: Props) {
               fontWeight: "700",
             }}
           >
-            ${payment.amount.toFixed(2)}
+            {formatCurrency(payment.amount)}
           </Text>
 
           <ChevronRight color={colors.icon} />

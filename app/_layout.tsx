@@ -32,6 +32,7 @@ export default function RootLayout() {
           name="trips"
           options={{
             title: "Trips",
+            popToTopOnBlur: true,
             tabBarIcon: ({ color, size }) => (
               <Route color={color} size={size} />
             ),

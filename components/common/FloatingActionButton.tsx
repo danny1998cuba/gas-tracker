@@ -15,15 +15,15 @@ export function FloatingActionButton({ onPress }: Props) {
         position: "absolute",
         elevation: 5,
 
-        bottom: 32,
+        bottom: theme.spacing.lg,
 
-        right: 24,
+        right: theme.spacing.xl,
 
-        height: 64,
+        height: theme.spacing["4xl"],
 
-        width: 64,
+        width: theme.spacing["4xl"],
 
-        borderRadius: 32,
+        borderRadius: theme.radius.full,
 
         alignItems: "center",
         backgroundColor: theme.colors.primary,

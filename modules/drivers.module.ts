@@ -16,6 +16,7 @@ const repository = {
   findById(id: string) {
     return db.query.drivers.findFirst({
       where: eq(drivers.id, id),
+      with: { vehicle: true },
     });
   },
 

@@ -4,10 +4,14 @@ import { payments } from "./payment";
 import { trips } from "./trip";
 import { vehicles } from "./vehicle";
 
-export const driversRelations = relations(drivers, ({ many }) => ({
+export const driversRelations = relations(drivers, ({ many, one }) => ({
   trips: many(trips),
 
   payments: many(payments),
+  vehicle: one(vehicles, {
+    fields: [drivers.preferredVehicleId],
+    references: [vehicles.id],
+  }),
 }));
 
 export const vehiclesRelations = relations(vehicles, ({ many }) => ({

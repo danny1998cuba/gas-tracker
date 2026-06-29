@@ -1,14 +1,16 @@
 import { PropsWithChildren } from "react";
 
-import { ScrollView, View } from "react-native";
+import { ScrollView, ScrollViewProps, View } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type Props = PropsWithChildren<{
-  scrollable?: boolean;
-}>;
+type Props = PropsWithChildren<
+  {
+    scrollable?: boolean;
+  } & ScrollViewProps
+>;
 
-export function Screen({ children, scrollable = true }: Props) {
+export function Screen({ children, scrollable, ...rest }: Props) {
   return (
     <SafeAreaView
       style={{
@@ -17,6 +19,7 @@ export function Screen({ children, scrollable = true }: Props) {
     >
       {scrollable ? (
         <ScrollView
+          {...rest}
           contentContainerStyle={{
             padding: 20,
             paddingBottom: 120,

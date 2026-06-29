@@ -49,7 +49,7 @@ export const emailFormatter: Formatter<string> = {
   mode: "never",
 };
 
-export const numberFormatter: Formatter<number | null> = {
+export const numberFormatter: Formatter<number | undefined> = {
   format(value) {
     if (value == null) return "";
 
@@ -59,7 +59,7 @@ export const numberFormatter: Formatter<number | null> = {
   parse(value) {
     const n = Number(value);
 
-    return Number.isNaN(n) ? null : n;
+    return Number.isNaN(n) ? undefined : n;
   },
 
   keyboardType: "decimal-pad",
@@ -88,5 +88,5 @@ export const currencyFormatter: Formatter<number | undefined> = {
 
   inputMode: "decimal",
 
-  mode: "always",
+  mode: "blur",
 };

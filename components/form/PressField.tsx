@@ -8,7 +8,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { FormField } from "./FormField";
 
 type Props = PropsWithChildren<{
-  label: string;
+  label?: string;
 
   value?: string;
 

@@ -1,0 +1,1 @@
+ALTER TABLE `drivers` ADD `preferredVehicleId` text REFERENCES vehicles(id);
