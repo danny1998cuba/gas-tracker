@@ -15,11 +15,12 @@ import { AppHeader } from "@/components/navigation/AppHeader";
 import { TripForm } from "@/features/trips/components/TripForm";
 import { TripFormData, tripSchema } from "@/features/trips/trip.schema";
 
+import { usePreferences } from "@/modules/preferences.module";
 import {
-    useCreateTrip,
-    useLastTrip,
-    useTrip,
-    useUpdateTrip,
+  useCreateTrip,
+  useLastTrip,
+  useTrip,
+  useUpdateTrip,
 } from "@/modules/trip.module";
 
 export default function TripEditor() {
@@ -31,19 +32,40 @@ export default function TripEditor() {
 
   const { data: trip, isPending } = useTrip(id ?? "");
   const { data: lastTrip, isPending: isLoadingLast } = useLastTrip();
+  const { data: preferences } = usePreferences();
 
   const createTrip = useCreateTrip();
   const updateTrip = useUpdateTrip();
 
+  const defaultTrip = preferences?.preloadLastTrip ? lastTrip : undefined;
+  const defaultDate =
+    preferences?.defaultTripDate === "last" && defaultTrip
+      ? defaultTrip.date
+      : new Date();
+
   const form = useForm<TripFormData>({
     resolver: zodResolver(tripSchema),
     defaultValues: {
-      date: trip?.date ?? new Date(),
-      driverId: (editing ? trip : lastTrip)?.driverId ?? "",
-      vehicleId: (editing ? trip : lastTrip)?.vehicleId ?? "",
+      date: trip?.date ?? defaultDate,
+
+      driverId: (editing ? trip : defaultTrip)?.driverId ?? "",
+
+      vehicleId: (editing ? trip : defaultTrip)?.vehicleId ?? "",
+
       distanceKm: trip?.distanceKm ?? 0,
-      gasPricePerLiter: (editing ? trip : lastTrip)?.gasPricePerLiter ?? 0,
-      payerCount: (editing ? trip : lastTrip)?.payerCount ?? 1,
+
+      gasPricePerLiter:
+        trip?.gasPricePerLiter ??
+        defaultTrip?.gasPricePerLiter ??
+        preferences?.defaultGasPrice ??
+        0,
+
+      payerCount:
+        trip?.payerCount ??
+        defaultTrip?.payerCount ??
+        preferences?.defaultPayerCount ??
+        1,
+
       notes: trip?.notes ?? "",
     },
   });

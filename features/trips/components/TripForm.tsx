@@ -15,6 +15,7 @@ import {
   textFormatter,
 } from "@/components/form/helpers/formatter/formatters";
 import { useDrivers } from "@/modules/drivers.module";
+import { usePreferences } from "@/modules/preferences.module";
 import { useVehicles } from "@/modules/vehicles.module";
 import { calculateTripSummary } from "@/utils/calculate-trip-cost";
 import { TripFormData } from "../trip.schema";
@@ -28,6 +29,8 @@ export function TripForm({ form }: Props) {
   const { data: drivers = [] } = useDrivers();
   const { data: vehicles = [] } = useVehicles();
 
+  const { data: preferences } = usePreferences();
+
   const driverId = useWatch({ control: form.control, name: "driverId" });
   const vehicleId = useWatch({ control: form.control, name: "vehicleId" });
   const distanceKm = useWatch({ control: form.control, name: "distanceKm" });
@@ -38,16 +41,20 @@ export function TripForm({ form }: Props) {
   const payerCount = useWatch({ control: form.control, name: "payerCount" });
 
   useEffect(() => {
-    if (vehicleId) return;
+    if (!preferences?.preloadPreferredVehicle || vehicleId) {
+      return;
+    }
 
     const driver = drivers.find((d) => d.id === driverId);
 
-    if (!driver?.preferredVehicleId) return;
+    if (!driver?.preferredVehicleId) {
+      return;
+    }
 
     form.setValue("vehicleId", driver.preferredVehicleId, {
       shouldValidate: true,
     });
-  }, [driverId, vehicleId, drivers, form]);
+  }, [preferences, driverId, vehicleId, drivers, form]);
 
   const vehicle = useMemo(
     () => vehicles.find((vehicle) => vehicle.id === vehicleId),

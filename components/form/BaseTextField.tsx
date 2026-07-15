@@ -23,15 +23,15 @@ import { useFormField } from "./hooks/useFormField";
 
 type FieldType = "text" | "phone" | "email" | "number" | "currency";
 
-type Props<T extends FieldValues> = Omit<
+type Props<T extends FieldValues, TName extends FieldPath<T>> = Omit<
   TextInputProps,
   "value" | "onChangeText"
 > & {
   control: Control<T>;
 
-  name: FieldPath<T>;
+  name: TName;
 
-  formatter: Formatter<FieldPathValue<T, FieldPath<T>>>;
+  formatter: Formatter<FieldPathValue<T, TName>>;
 
   label: string;
 
@@ -44,7 +44,7 @@ type Props<T extends FieldValues> = Omit<
   multiline?: boolean;
 };
 
-function BaseTextFieldInner<T extends FieldValues>(
+function BaseTextFieldInner<T extends FieldValues, TName extends FieldPath<T>>(
   {
     control,
     name,
@@ -55,7 +55,7 @@ function BaseTextFieldInner<T extends FieldValues>(
     type = "text",
     multiline,
     ...props
-  }: Props<T>,
+  }: Props<T, TName>,
   ref: React.ForwardedRef<TextInput>,
 ) {
   const { colors, spacing, radius } = useTheme();
@@ -138,8 +138,9 @@ function BaseTextFieldInner<T extends FieldValues>(
 
 export const BaseTextField = forwardRef(BaseTextFieldInner) as <
   T extends FieldValues,
+  TName extends FieldPath<T>,
 >(
-  props: Props<T> & {
+  props: Props<T, TName> & {
     ref?: React.Ref<TextInput>;
   },
 ) => React.ReactElement;

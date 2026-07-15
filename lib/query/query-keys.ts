@@ -17,4 +17,6 @@ export const queryKeys = {
   settings: ["settings"],
 
   reports: ["reports"],
+
+  preferences: ["preferences"],
 } as const;

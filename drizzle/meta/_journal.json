@@ -15,6 +15,13 @@
       "when": 1782748327713,
       "tag": "0001_nosy_shockwave",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1784079439024,
+      "tag": "0002_thankful_roughhouse",
+      "breakpoints": true
     }
   ]
 }

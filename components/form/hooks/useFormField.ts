@@ -5,17 +5,16 @@ import {
   useController,
 } from "react-hook-form";
 
-type Props<T extends FieldValues> = {
+type Props<T extends FieldValues, TName extends FieldPath<T>> = {
   control: Control<T>;
-
-  name: FieldPath<T>;
+  name: TName;
 };
 
-export function useFormField<T extends FieldValues>({
-  control,
-  name,
-}: Props<T>) {
-  const { field, fieldState } = useController({
+export function useFormField<
+  T extends FieldValues,
+  TName extends FieldPath<T>,
+>({ control, name }: Props<T, TName>) {
+  const { field, fieldState } = useController<T, TName>({
     control,
     name,
   });

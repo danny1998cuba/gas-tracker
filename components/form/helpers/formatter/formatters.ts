@@ -49,7 +49,7 @@ export const emailFormatter: Formatter<string> = {
   mode: "never",
 };
 
-export const numberFormatter: Formatter<number | undefined> = {
+export const numberFormatter: Formatter<number> = {
   format(value) {
     if (value == null) return "";
 
@@ -59,7 +59,7 @@ export const numberFormatter: Formatter<number | undefined> = {
   parse(value) {
     const n = Number(value);
 
-    return Number.isNaN(n) ? undefined : n;
+    return Number.isNaN(n) ? 0 : n;
   },
 
   keyboardType: "decimal-pad",
@@ -69,7 +69,7 @@ export const numberFormatter: Formatter<number | undefined> = {
   mode: "always",
 };
 
-export const currencyFormatter: Formatter<number | undefined> = {
+export const currencyFormatter: Formatter<number> = {
   format(value) {
     if (value == null) return "";
 
@@ -81,7 +81,7 @@ export const currencyFormatter: Formatter<number | undefined> = {
 
     const n = Number(clean);
 
-    return Number.isNaN(n) ? undefined : n;
+    return Number.isNaN(n) ? 0 : n;
   },
 
   keyboardType: "decimal-pad",

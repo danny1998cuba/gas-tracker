@@ -66,6 +66,7 @@ export default function RootLayout() {
           name="settings"
           options={{
             title: "Settings",
+            popToTopOnBlur: true,
 
             tabBarIcon: ({ color, size }) => (
               <Settings color={color} size={size} />
