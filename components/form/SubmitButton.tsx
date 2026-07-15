@@ -1,4 +1,10 @@
-import { ActivityIndicator, Pressable } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  PressableProps,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 
 import { Text } from "@/components/common/ThemedText";
 
@@ -12,23 +18,34 @@ type Props = {
   disabled?: boolean;
 
   onPress: () => void;
-};
 
-export function SubmitButton({ title, loading, disabled, onPress }: Props) {
-  const { colors, radius, spacing } = useTheme();
+  style?: StyleProp<ViewStyle>;
+} & Omit<PressableProps, "disabled" | "style">;
+
+export function SubmitButton({
+  title,
+  loading,
+  disabled,
+  onPress,
+  style,
+  ...props
+}: Props) {
+  const { colors, radius } = useTheme();
 
   return (
     <Pressable
+      {...props}
       disabled={disabled || loading}
       onPress={onPress}
-      style={{
-        height: 52,
-        borderRadius: radius.md,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: spacing.xl,
-        backgroundColor: disabled ? colors.border : colors.primary,
-      }}
+      style={[
+        style,
+        {
+          borderRadius: radius.md,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: disabled ? colors.border : colors.primary,
+        },
+      ]}
     >
       {loading ? (
         <ActivityIndicator color="white" />

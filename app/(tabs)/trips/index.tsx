@@ -6,24 +6,23 @@ import { AppHeader } from "@/components/navigation/AppHeader";
 
 import { TripListItem } from "@/features/trips/components/TripListItem";
 
-import { useTrips } from "@/modules/trip.module";
+import { useTrips, useTripsSummary } from "@/modules/trip.module";
 
+import { Button } from "@/components/common/Button";
 import { EmptyState } from "@/components/common/EmptyState";
+import { Text } from "@/components/common/ThemedText";
 import { useTheme } from "@/hooks/use-theme";
+import { getCurrentWeekRange } from "@/utils/date.utils";
 import { Plus } from "lucide-react-native";
-import { useMemo } from "react";
 import { FlatList, View } from "react-native";
 
 export default function TripsScreen() {
-  const { data = [], isPending } = useTrips();
-  const { spacing } = useTheme();
+  const { from, to } = getCurrentWeekRange();
 
-  const stats = useMemo(() => {
-    return {
-      debt: data.reduce((sum, trip) => sum + trip.amountOwed, 0),
-      trips: data.length,
-    };
-  }, [data]);
+  const { data = [], isPending } = useTrips({ from, to });
+  const { spacing, typography } = useTheme();
+
+  const { data: summary } = useTripsSummary();
 
   return (
     <>
@@ -45,11 +44,39 @@ export default function TripsScreen() {
           style={{
             marginTop: -spacing.xl,
             flexDirection: "row",
-            gap: 12,
+            gap: spacing.md,
           }}
         >
-          <StatCard title="Current debt" value={`$${stats.debt.toFixed(2)}`} />
-          <StatCard title="Trips" value={`${stats.trips}`} />
+          <StatCard
+            title="Current debt"
+            value={`$${(summary?.debt ?? 0).toFixed(2)}`}
+          />
+
+          <StatCard title="Total trips" value={`${summary?.trips ?? 0}`} />
+        </View>
+
+        <View
+          style={{
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: spacing.xl,
+            paddingHorizontal: spacing.sm,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: typography.section,
+            }}
+          >
+            Last 7 days
+          </Text>
+
+          <Button
+            onPress={() => router.push("/trips/history")}
+            title="View all"
+            style={{ height: 35, paddingHorizontal: spacing.md }}
+          />
         </View>
 
         <FlatList
@@ -60,8 +87,8 @@ export default function TripsScreen() {
           keyExtractor={(item) => item.id}
           ListEmptyComponent={() => (
             <EmptyState
-              title="No trips yet"
-              description="Register your first trip to see information"
+              title="No trips this week"
+              description="Create your first trip to start tracking fuel expenses."
               actions={[
                 {
                   action() {

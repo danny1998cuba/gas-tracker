@@ -42,8 +42,6 @@ export function PaymentForm({ form }: Props) {
         placeholder="0.00"
       />
 
-      {/* Temporal hasta crear DateField */}
-
       <DateField
         required
         control={form.control}

@@ -26,7 +26,6 @@ export function DriverForm({ form }: Props) {
         label="Name"
         required
         placeholder="John Doe"
-        returnKeyType="next"
         formatter={textFormatter}
         autoComplete="name"
       />

@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte, SQL } from "drizzle-orm";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { trips } from "@/db/schema";
 
 import { queryKeys } from "@/lib/query/query-keys";
+import { calculateTripSummary } from "@/utils/calculate-trip-cost";
 
 export type Trip = typeof trips.$inferSelect;
 
@@ -24,44 +25,74 @@ export type TripSummary = {
   payerCount: number;
 };
 
+export type TripsSummary = {
+  trips: number;
+  debt: number;
+  totalDistanceKm: number;
+  totalFuelConsumed: number;
+  totalCost: number;
+};
+
+export type TripFilters = {
+  driverId?: string;
+  from?: Date;
+  to?: Date;
+  limit?: number;
+  order?: "asc" | "desc";
+};
+
 type TripEntity = Awaited<ReturnType<typeof repository.findById>>;
 export type TripWithSummary = NonNullable<TripEntity> & TripSummary;
 
-function calculateSummary(
-  distanceKm: number,
-
-  fuelEfficiency: number,
-
-  gasPricePerLiter: number,
-
-  payerCount: number,
-): TripSummary {
-  const litersConsumed = (distanceKm * fuelEfficiency) / 100;
-
-  const totalCost = litersConsumed * gasPricePerLiter;
-
-  const amountOwed = totalCost / payerCount;
-
+function enrichTrip(trip: NonNullable<TripEntity>) {
   return {
-    litersConsumed,
-    fuelEfficiency,
-    totalCost,
-    amountOwed,
-    payerCount,
-    costPerPassenger: amountOwed,
-    costPerKm: totalCost / distanceKm,
+    ...trip,
+    ...calculateTripSummary(
+      trip.distanceKm,
+      trip.vehicle.fuelEfficiency,
+      trip.gasPricePerLiter,
+      trip.payerCount,
+    ),
   };
 }
 
 const repository = {
-  findAll() {
+  findAll(filters?: TripFilters) {
+    const conditions: SQL[] = [];
+
+    if (filters?.driverId) {
+      conditions.push(eq(trips.driverId, filters.driverId));
+    }
+
+    if (filters?.from) {
+      conditions.push(gte(trips.date, filters.from));
+    }
+
+    if (filters?.to) {
+      conditions.push(lte(trips.date, filters.to));
+    }
+
     return db.query.trips.findMany({
+      where: conditions.length ? and(...conditions) : undefined,
+
+      orderBy: (trip, operators) => [
+        filters?.order === "asc"
+          ? operators.asc(trip.date)
+          : operators.desc(trip.date),
+      ],
+
+      limit: filters?.limit,
+
       with: {
         driver: true,
 
         vehicle: true,
       },
     });
+  },
+
+  getSummary() {
+    return this.findAll();
   },
 
   findLastTrip() {
@@ -77,38 +108,6 @@ const repository = {
   findById(id: string) {
     return db.query.trips.findFirst({
       where: eq(trips.id, id),
-
-      with: {
-        driver: true,
-
-        vehicle: true,
-      },
-    });
-  },
-
-  findByDriver(driverId: string) {
-    return db.query.trips.findMany({
-      where: eq(trips.driverId, driverId),
-
-      with: {
-        driver: true,
-
-        vehicle: true,
-      },
-    });
-  },
-
-  findByDateRange(
-    from: Date,
-
-    to: Date,
-  ) {
-    return db.query.trips.findMany({
-      where: and(
-        gte(trips.date, from),
-
-        lte(trips.date, to),
-      ),
 
       with: {
         driver: true,
@@ -136,19 +135,9 @@ const repository = {
 };
 
 const service = {
-  async getAll() {
-    const data = await repository.findAll();
-
-    return data.map((trip) => ({
-      ...trip,
-
-      ...calculateSummary(
-        trip.distanceKm,
-        trip.vehicle.fuelEfficiency,
-        trip.gasPricePerLiter,
-        trip.payerCount,
-      ),
-    }));
+  async getAll(filters?: TripFilters) {
+    const data = await repository.findAll(filters);
+    return data.map(enrichTrip);
   },
 
   async getById(id?: string) {
@@ -157,69 +146,49 @@ const service = {
     const trip = await repository.findById(id);
     if (!trip) return null;
 
-    return {
-      ...trip,
-      ...calculateSummary(
-        trip.distanceKm,
-        trip.vehicle.fuelEfficiency,
-        trip.gasPricePerLiter,
-        trip.payerCount,
-      ),
-    };
+    return enrichTrip(trip);
   },
 
   async getLastTrip() {
     const trip = await repository.findLastTrip();
     if (!trip) return null;
-
-    return {
-      ...trip,
-      ...calculateSummary(
-        trip.distanceKm,
-        trip.vehicle.fuelEfficiency,
-        trip.gasPricePerLiter,
-        trip.payerCount,
-      ),
-    };
+    return enrichTrip(trip);
   },
 
-  async getByDriver(driverId: string) {
-    const trips = await repository.findByDriver(driverId);
+  async getSummary(): Promise<TripsSummary> {
+    const data = await repository.getSummary();
 
-    return trips.map((trip) => ({
-      ...trip,
-      ...calculateSummary(
-        trip.distanceKm,
-        trip.vehicle.fuelEfficiency,
-        trip.gasPricePerLiter,
-        trip.payerCount,
-      ),
-    }));
-  },
+    return data.reduce<TripsSummary>(
+      (summary, trip) => {
+        const calculation = calculateTripSummary(
+          trip.distanceKm,
+          trip.vehicle.fuelEfficiency,
+          trip.gasPricePerLiter,
+          trip.payerCount,
+        );
+        summary.trips++;
+        summary.debt += calculation.amountOwed;
+        summary.totalDistanceKm += trip.distanceKm;
+        summary.totalFuelConsumed += calculation.litersConsumed;
+        summary.totalCost += calculation.totalCost;
 
-  async getByDateRange(from: Date, to: Date) {
-    const trips = await repository.findByDateRange(from, to);
-
-    return trips.map((trip) => ({
-      ...trip,
-      ...calculateSummary(
-        trip.distanceKm,
-        trip.vehicle.fuelEfficiency,
-        trip.gasPricePerLiter,
-        trip.payerCount,
-      ),
-    }));
+        return summary;
+      },
+      {
+        trips: 0,
+        debt: 0,
+        totalDistanceKm: 0,
+        totalFuelConsumed: 0,
+        totalCost: 0,
+      },
+    );
   },
 
   create(data: CreateTrip) {
     return repository.create(data);
   },
 
-  update(
-    id: string,
-
-    data: UpdateTrip,
-  ) {
+  update(id: string, data: UpdateTrip) {
     return repository.update(id, data);
   },
 
@@ -228,10 +197,10 @@ const service = {
   },
 };
 
-export function useTrips() {
+export function useTrips(filters?: TripFilters) {
   return useQuery({
-    queryKey: queryKeys.trips,
-    queryFn: () => service.getAll(),
+    queryKey: [...queryKeys.trips, filters],
+    queryFn: () => service.getAll(filters),
   });
 }
 
@@ -249,25 +218,10 @@ export function useLastTrip() {
   });
 }
 
-export function useTripsByDriver(driverId: string) {
+export function useTripsSummary() {
   return useQuery({
-    enabled: !!driverId,
-
-    queryKey: [queryKeys.trips, "driver", driverId],
-
-    queryFn: () => service.getByDriver(driverId),
-  });
-}
-
-export function useTripsByDateRange(
-  from: Date,
-
-  to: Date,
-) {
-  return useQuery({
-    queryKey: [queryKeys.trips, from, to],
-
-    queryFn: () => service.getByDateRange(from, to),
+    queryKey: [...queryKeys.trips, "summary"],
+    queryFn: () => service.getSummary(),
   });
 }
 
@@ -279,11 +233,15 @@ export function useCreateTrip() {
 
     onSuccess() {
       qc.invalidateQueries({
-        queryKey: queryKeys.trips,
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.trips);
+        },
       });
 
       qc.invalidateQueries({
-        queryKey: queryKeys.reports,
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.reports);
+        },
       });
     },
   });
@@ -308,7 +266,9 @@ export function useUpdateTrip() {
       variables,
     ) {
       qc.invalidateQueries({
-        queryKey: queryKeys.trips,
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.trips);
+        },
       });
 
       qc.invalidateQueries({
@@ -316,7 +276,9 @@ export function useUpdateTrip() {
       });
 
       qc.invalidateQueries({
-        queryKey: queryKeys.reports,
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.reports);
+        },
       });
     },
   });
@@ -330,11 +292,15 @@ export function useDeleteTrip() {
 
     onSuccess() {
       qc.invalidateQueries({
-        queryKey: queryKeys.trips,
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.trips);
+        },
       });
 
       qc.invalidateQueries({
-        queryKey: queryKeys.reports,
+        predicate(query) {
+          return query.queryKey.includes(queryKeys.reports);
+        },
       });
     },
   });

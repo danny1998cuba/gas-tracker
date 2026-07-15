@@ -1,4 +1,10 @@
-import { useEffect, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 import { StyleSheet, TextInput, TextInputProps } from "react-native";
 
@@ -12,7 +18,6 @@ import {
 import { useTheme } from "@/hooks/use-theme";
 
 import { FormField } from "./FormField";
-
 import { Formatter } from "./helpers/formatter/formatter.types";
 import { useFormField } from "./hooks/useFormField";
 
@@ -39,20 +44,26 @@ type Props<T extends FieldValues> = Omit<
   multiline?: boolean;
 };
 
-export function BaseTextField<T extends FieldValues>({
-  control,
-  name,
-  formatter,
-  label,
-  helperText,
-  required,
-  type = "text",
-  multiline,
-  ...props
-}: Props<T>) {
+function BaseTextFieldInner<T extends FieldValues>(
+  {
+    control,
+    name,
+    formatter,
+    label,
+    helperText,
+    required,
+    type = "text",
+    multiline,
+    ...props
+  }: Props<T>,
+  ref: React.ForwardedRef<TextInput>,
+) {
   const { colors, spacing, radius } = useTheme();
 
   const { field, error } = useFormField({ control, name });
+
+  const inputRef = useRef<TextInput>(null);
+  useImperativeHandle(ref, () => inputRef.current!, []);
 
   const [displayValue, setDisplayValue] = useState("");
   const [focused, setFocused] = useState(false);
@@ -84,6 +95,7 @@ export function BaseTextField<T extends FieldValues>({
       error={error}
     >
       <TextInput
+        ref={inputRef}
         {...props}
         multiline={multiline}
         inputMode={formatter.inputMode}
@@ -104,27 +116,19 @@ export function BaseTextField<T extends FieldValues>({
         onFocus={() => setFocused(true)}
         style={[
           styles.input,
-
           {
             color: colors.text,
-
             backgroundColor: colors.surface,
-
             borderRadius: radius.md,
-
             padding: spacing.md,
-
             minHeight: multiline ? 120 : 48,
-
             textAlignVertical: multiline ? "top" : "center",
-
             borderColor: error
               ? colors.danger
               : focused
                 ? colors.primary
                 : colors.border,
           },
-
           props.style,
         ]}
       />
@@ -132,10 +136,17 @@ export function BaseTextField<T extends FieldValues>({
   );
 }
 
+export const BaseTextField = forwardRef(BaseTextFieldInner) as <
+  T extends FieldValues,
+>(
+  props: Props<T> & {
+    ref?: React.Ref<TextInput>;
+  },
+) => React.ReactElement;
+
 const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
-
     fontSize: 16,
   },
 });
