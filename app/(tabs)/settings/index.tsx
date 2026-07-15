@@ -17,6 +17,12 @@ export default function SettingsScreen() {
             subtitle="Units, defaults and behavior"
             onPress={() => router.push("/settings/preferences")}
           />
+
+          <MenuCard
+            title="Appearance"
+            subtitle="Theme and display"
+            onPress={() => router.push("/settings/appearance")}
+          />
         </Section>
 
         <Section title="Data">

@@ -11,6 +11,11 @@ export const preferences = sqliteTable("preferences", {
 
   defaultPayerCount: integer().notNull().default(1),
 
+  theme: text()
+    .$type<"system" | "light" | "dark">()
+    .notNull()
+    .default("system"),
+
   preloadPreferredVehicle: integer({
     mode: "boolean",
   })

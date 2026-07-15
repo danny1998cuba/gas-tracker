@@ -3,14 +3,13 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { useTheme } from "@/hooks/use-theme";
-import AppProviders from "@/lib/providers/AppProviders";
 import { ChartColumn, Ellipsis, Route, Settings } from "lucide-react-native";
 
 export default function RootLayout() {
   const { colors } = useTheme();
 
   return (
-    <AppProviders>
+    <>
       <Tabs
         screenOptions={{
           tabBarInactiveTintColor: colors.tabIconDefault,
@@ -75,6 +74,6 @@ export default function RootLayout() {
         />
       </Tabs>
       <StatusBar style="auto" />
-    </AppProviders>
+    </>
   );
 }

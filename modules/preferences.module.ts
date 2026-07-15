@@ -74,3 +74,9 @@ export function useUpdatePreferences() {
 export async function getPreferences() {
   return repository.getOrCreate();
 }
+
+export async function persistTheme(theme: "system" | "light" | "dark") {
+  return repository.update({
+    theme,
+  });
+}
