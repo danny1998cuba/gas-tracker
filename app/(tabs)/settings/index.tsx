@@ -48,7 +48,7 @@ export default function SettingsScreen() {
         <Section title="Advanced">
           <MenuCard
             title="Advanced"
-            subtitle="Maintenance tools"
+            subtitle="Maintenance and diagnostics"
             onPress={() => router.push("/settings/advanced")}
           />
         </Section>

@@ -1,17 +1,27 @@
-import { Text } from "@/components/common/ThemedText";
+import { router } from "expo-router";
+
 import { Screen } from "@/components/layout/Screen";
 import { AppHeader } from "@/components/navigation/AppHeader";
 
-export default function SettingsComingScreen() {
+import { MenuCard } from "@/components/cards/MenuCard";
+
+export default function AdvancedScreen() {
   return (
     <>
-      <AppHeader title="Settings" canGoBack />
+      <AppHeader canGoBack title="Advanced" />
+
       <Screen>
-        <Text
-          style={{ textAlign: "center", paddingVertical: 100, fontSize: 32 }}
-        >
-          Comming soon...
-        </Text>
+        <MenuCard
+          title="Database"
+          subtitle="Statistics and maintenance"
+          onPress={() => router.push("/settings/database")}
+        />
+
+        <MenuCard
+          title="Reset Application"
+          subtitle="Delete all application data"
+          onPress={() => router.push("/settings/reset")}
+        />
       </Screen>
     </>
   );
