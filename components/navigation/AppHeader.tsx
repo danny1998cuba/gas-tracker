@@ -28,6 +28,7 @@ type Props = {
   subtitle?: string;
 
   canGoBack?: boolean;
+  backAction?: () => void;
 
   leftAction?: HeaderAction;
 
@@ -39,6 +40,7 @@ export function AppHeader({
   subtitle,
 
   canGoBack = false,
+  backAction,
 
   leftAction,
 
@@ -66,7 +68,13 @@ export function AppHeader({
       >
         <View style={styles.side}>
           {canGoBack ? (
-            <HeaderButton icon={ChevronLeft} onPress={() => router.back()} />
+            <HeaderButton
+              icon={ChevronLeft}
+              onPress={() => {
+                if (backAction) backAction();
+                else router.back();
+              }}
+            />
           ) : leftAction ? (
             <HeaderButton {...leftAction} />
           ) : (

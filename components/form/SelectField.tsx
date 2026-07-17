@@ -13,6 +13,8 @@ type Props<T extends FieldValues> = {
 
   label: string;
 
+  disabled?: boolean;
+
   placeholder?: string;
   required?: boolean;
 
@@ -30,6 +32,7 @@ export function SelectField<T extends FieldValues>({
   placeholder,
 
   options,
+  disabled,
 }: Props<T>) {
   const [open, setOpen] = useState(false);
   const { field, error } = useFormField({
@@ -42,6 +45,7 @@ export function SelectField<T extends FieldValues>({
   return (
     <>
       <PressField
+        disabled={disabled}
         required={required}
         label={label}
         error={error}

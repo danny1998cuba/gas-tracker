@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ActivityIndicator, FlatList } from "react-native";
 
-import { router } from "expo-router";
+import { RelativePathString, router, useLocalSearchParams } from "expo-router";
 
 import { EmptyState } from "@/components/common/EmptyState";
 
@@ -17,8 +17,15 @@ import { useTheme } from "@/hooks/use-theme";
 import { Funnel } from "lucide-react-native";
 
 export default function TripHistoryScreen() {
+  const params = useLocalSearchParams<{
+    driverId?: string;
+    returnTo?: RelativePathString;
+  }>();
+
   const { spacing } = useTheme();
-  const [filters, setFilters] = useState<TripFiltersValue>({});
+  const [filters, setFilters] = useState<TripFiltersValue>({
+    driverId: params.driverId,
+  });
 
   const [open, setOpen] = useState(false);
 
@@ -28,7 +35,14 @@ export default function TripHistoryScreen() {
     <>
       <AppHeader
         canGoBack
-        title="All Trips"
+        backAction={() => {
+          if (params.returnTo) {
+            router.replace({ pathname: params.returnTo });
+          } else {
+            router.back();
+          }
+        }}
+        title={params.driverId ? "Driver Trips" : "All Trips"}
         rightActions={[
           {
             icon: Funnel,
@@ -80,6 +94,7 @@ export default function TripHistoryScreen() {
         filters={filters}
         onClose={() => setOpen(false)}
         onApply={setFilters}
+        lockedDriverId={params.driverId}
       />
     </>
   );

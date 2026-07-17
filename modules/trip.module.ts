@@ -41,6 +41,13 @@ export type TripFilters = {
   order?: "asc" | "desc";
 };
 
+export type DriverTripSummary = {
+  trips: number;
+  distanceKm: number;
+  totalCost: number;
+  amountOwed: number;
+};
+
 type TripEntity = Awaited<ReturnType<typeof repository.findById>>;
 export type TripWithSummary = NonNullable<TripEntity> & TripSummary;
 
@@ -195,6 +202,36 @@ const service = {
   delete(id: string) {
     return repository.delete(id);
   },
+
+  async getDriverSummary(driverId: string): Promise<DriverTripSummary> {
+    const trips = await repository.findAll({
+      driverId,
+    });
+
+    return trips.reduce<DriverTripSummary>(
+      (acc, trip) => {
+        const summary = calculateTripSummary(
+          trip.distanceKm,
+          trip.vehicle.fuelEfficiency,
+          trip.gasPricePerLiter,
+          trip.payerCount,
+        );
+
+        acc.trips++;
+        acc.distanceKm += trip.distanceKm;
+        acc.totalCost += summary.totalCost;
+        acc.amountOwed += summary.amountOwed;
+
+        return acc;
+      },
+      {
+        trips: 0,
+        distanceKm: 0,
+        totalCost: 0,
+        amountOwed: 0,
+      },
+    );
+  },
 };
 
 export function useTrips(filters?: TripFilters) {
@@ -275,5 +312,13 @@ export function useDeleteTrip() {
       qc.invalidateQueries({ queryKey: queryKeys.trips });
       qc.invalidateQueries({ queryKey: queryKeys.reports });
     },
+  });
+}
+
+export function useDriverTripSummary(driverId: string) {
+  return useQuery({
+    enabled: !!driverId,
+    queryKey: [...queryKeys.trips, ...queryKeys.driver(driverId), "summary"],
+    queryFn: () => service.getDriverSummary(driverId),
   });
 }

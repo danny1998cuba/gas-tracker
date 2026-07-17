@@ -11,8 +11,10 @@ import { AppHeader } from "@/components/navigation/AppHeader";
 import DetailsFieldRow from "@/components/common/DetailsFieldRow";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
 import { formatPhone } from "@/components/form/helpers/formatter/phone-number.helper";
+import { DriverTripSummaryCard } from "@/features/drivers/components/DriverTripSummary";
 import { useTheme } from "@/hooks/use-theme";
 import { useDeleteDriver, useDriver } from "@/modules/drivers.module";
+import { useDriverTripSummary } from "@/modules/trip.module";
 import { useState } from "react";
 
 export default function DriverDetails() {
@@ -25,6 +27,8 @@ export default function DriverDetails() {
 
   const { data: driver, isPending } = useDriver(id);
   const deleteDriver = useDeleteDriver();
+
+  const { data: summary } = useDriverTripSummary(id);
 
   if (isPending) {
     return <ActivityIndicator />;
@@ -104,9 +108,20 @@ export default function DriverDetails() {
             marginTop: spacing.xl,
           }}
         >
-          <Text type="textSecondary">
-            Trips, payments and balance will appear here in the next iteration.
-          </Text>
+          {summary && (
+            <DriverTripSummaryCard
+              summary={summary}
+              onPressHistory={() =>
+                router.push({
+                  pathname: "/trips/history",
+                  params: {
+                    driverId: driver.id,
+                    returnTo: `/more/drivers/details?id=${driver.id}`,
+                  },
+                })
+              }
+            />
+          )}
         </View>
       </Screen>
 

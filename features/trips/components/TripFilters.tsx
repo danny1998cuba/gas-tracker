@@ -24,6 +24,8 @@ type Props = {
   onApply(filters: TripFiltersValue): void;
 
   onClear?(): void;
+
+  lockedDriverId?: string;
 };
 
 export function TripFilters({
@@ -32,13 +34,18 @@ export function TripFilters({
   onApply,
 
   onClear,
+
+  lockedDriverId,
 }: Props) {
   const { spacing } = useTheme();
 
   const { data: drivers = [] } = useDrivers();
 
   const form = useForm<TripFiltersValue>({
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      driverId: lockedDriverId ?? defaultValues?.driverId,
+    },
   });
 
   const driverId = useWatch({
@@ -73,6 +80,7 @@ export function TripFilters({
     <>
       <SelectField
         control={form.control}
+        disabled={!!lockedDriverId}
         name="driverId"
         label="Driver"
         placeholder="All drivers"
@@ -121,7 +129,7 @@ export function TripFilters({
           title="Clear"
           onPress={() => {
             form.reset({
-              driverId: "",
+              driverId: lockedDriverId ?? "",
               from: undefined,
               to: undefined,
             });
