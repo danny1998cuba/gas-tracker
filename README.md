@@ -1,50 +1,157 @@
-# Welcome to your Expo app 👋
+# Gas Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An offline-first mobile application built with Expo and React Native to track work trips, fuel expenses, driver balances, and payments.
 
-## Get started
+The application is designed for teams or individuals who need to calculate fuel reimbursement accurately while keeping all data locally on the device.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+### Trips
 
-2. Start the app
+- Create and manage trips
+- Automatic fuel consumption calculation
+- Automatic trip cost calculation
+- Automatic amount owed per passenger
+- Trip history
+- Advanced filtering
+- Driver and vehicle summaries
 
-   ```bash
-   npx expo start
-   ```
+### Drivers
 
-In the output, you'll find options to open the app in a
+- Driver management
+- Preferred vehicle
+- Trip summary
+- Driver trip history
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Vehicles
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Vehicle management
+- Fuel efficiency configuration
+- Vehicle trip history
 
-## Get a fresh project
+### Payments
 
-When you're ready, run:
+- Register driver payments
+- Payment history
 
-```bash
-npm run reset-project
+### Reports
+
+- Global dashboard
+- Driver reports
+- Vehicle reports
+- Date filtering
+- Driver filtering
+
+### Preferences
+
+- Theme (Light / Dark / System)
+- Currency
+- Distance unit
+- Default gas price
+- Default passenger count
+- Default trip date
+- Preferred vehicle preload
+- Last trip preload
+
+### Data Management
+
+- Export data as JSON
+- Import data
+- Local backups
+- Backup restore
+- Database maintenance
+- Application reset
+
+---
+
+## Tech Stack
+
+- Expo SDK 54
+- React Native
+- Expo Router
+- TypeScript
+- Drizzle ORM
+- Expo SQLite
+- TanStack Query
+- React Hook Form
+- Zod
+- Lucide Icons
+
+---
+
+## Screens
+
+- Dashboard
+- Trips
+- Trip History
+- Trip Details
+- Drivers
+- Driver Details
+- Vehicles
+- Vehicle Details
+- Payments
+- Reports
+- Settings
+
+---
+
+## Calculations
+
+Fuel consumed:
+
+```
+(distance × fuel efficiency) / 100
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Trip cost:
 
-## Learn more
+```
+fuel consumed × fuel price
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Amount owed:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
+trip cost / passengers
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## Running locally
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm install
+```
+
+```bash
+npx expo start
+```
+
+Android
+
+```bash
+npx expo run:android
+```
+
+iOS
+
+```bash
+npx expo run:ios
+```
+
+---
+
+## Roadmap
+
+- Charts
+- PDF reports
+- CSV export
+- Cloud synchronization
+- Multi-device support
+- Notifications
+
+---
+
+## License
+
+MIT
