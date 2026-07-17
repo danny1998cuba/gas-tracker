@@ -1,7 +1,7 @@
+import { queryClient } from "@/lib/query/query-client";
 import { useMutation } from "@tanstack/react-query";
 
-import { queryClient } from "@/lib/query/query-client";
-
+import { reloadApp } from "@/utils/reload-app";
 import { resetApplication } from "./reset.service";
 
 export function useResetApplication() {
@@ -9,6 +9,7 @@ export function useResetApplication() {
     mutationFn: resetApplication,
 
     async onSuccess() {
+      await reloadApp();
       await queryClient.invalidateQueries();
     },
   });

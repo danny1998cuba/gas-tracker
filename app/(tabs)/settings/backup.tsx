@@ -22,6 +22,7 @@ import { Text } from "@/components/common/ThemedText";
 import { BackupFile } from "@/features/data/backup/backup.types";
 import { useTheme } from "@/hooks/use-theme";
 import { queryClient } from "@/lib/query/query-client";
+import { reloadApp } from "@/utils/reload-app";
 import { router } from "expo-router";
 import { useState } from "react";
 
@@ -89,7 +90,8 @@ export default function BackupScreen() {
 
                   onPress: async () => {
                     await restoreBackup.mutateAsync(selected.uri);
-                    await queryClient.invalidateQueries();
+                    queryClient.clear();
+                    await reloadApp();
                     router.back();
                   },
                 },

@@ -35,7 +35,7 @@ export function DateField<T extends FieldValues>({
 
   placeholder,
   required,
-  mode,
+  mode = "date",
 }: Props<T>) {
   const [iosVisible, setIosVisible] = useState(false);
   const { spacing } = useTheme();

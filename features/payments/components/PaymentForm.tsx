@@ -47,6 +47,7 @@ export function PaymentForm({ form }: Props) {
         control={form.control}
         name="paymentDate"
         label="Payment Date"
+        mode="datetime"
       />
 
       <BaseTextField

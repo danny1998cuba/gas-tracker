@@ -13,6 +13,7 @@ import { queryClient } from "@/lib/query/query-client";
 import { Button } from "@/components/common/Button";
 import { importDatabase } from "@/features/data/import/import.service";
 import { useTheme } from "@/hooks/use-theme";
+import { reloadApp } from "@/utils/reload-app";
 import { Alert } from "react-native";
 
 export default function ImportScreen() {
@@ -39,6 +40,8 @@ export default function ImportScreen() {
             }
 
             await queryClient.invalidateQueries();
+            await reloadApp();
+
             Alert.alert(
               "Replace data",
               "The data has been successfully imported",
