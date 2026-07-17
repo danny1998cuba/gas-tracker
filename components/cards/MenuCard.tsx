@@ -41,14 +41,14 @@ export function MenuCard({
           backgroundColor: theme.colors.card,
 
           marginBottom: theme.spacing.md,
+
           ...theme.elevation.card,
         }}
       >
-        <View>
+        <View style={{ maxWidth: "85%" }}>
           <Text
             style={{
               fontSize: 18,
-
               fontWeight: "600",
             }}
           >

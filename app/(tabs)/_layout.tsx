@@ -3,10 +3,12 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { useTheme } from "@/hooks/use-theme";
+import { useThemeMode } from "@/lib/providers/ColorSchemeProvider";
 import { ChartColumn, Ellipsis, Route, Settings } from "lucide-react-native";
 
 export default function RootLayout() {
   const { colors } = useTheme();
+  const { colorScheme } = useThemeMode();
 
   return (
     <>
@@ -73,7 +75,7 @@ export default function RootLayout() {
           }}
         />
       </Tabs>
-      <StatusBar style="auto" />
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
     </>
   );
 }

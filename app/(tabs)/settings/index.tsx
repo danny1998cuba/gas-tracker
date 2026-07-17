@@ -27,20 +27,20 @@ export default function SettingsScreen() {
 
         <Section title="Data">
           <MenuCard
-            title="Export database"
-            subtitle="Export all application data"
+            title="Export Data"
+            subtitle="Share all application data"
             onPress={() => router.push("/settings/export")}
           />
 
           <MenuCard
-            title="Import database"
-            subtitle="Replace data from a backup"
+            title="Import Data"
+            subtitle="Restore data from a backup"
             onPress={() => router.push("/settings/import")}
           />
 
           <MenuCard
             title="Backup"
-            subtitle="Create or restore backups"
+            subtitle="Create or restore local backups"
             onPress={() => router.push("/settings/backup")}
           />
         </Section>
