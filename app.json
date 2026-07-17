@@ -1,7 +1,6 @@
 {
   "expo": {
     "name": "Gas Tracker",
-    "owner": "CoreX4Dev",
     "slug": "gas-tracker",
     "version": "0.5.0",
     "orientation": "portrait",

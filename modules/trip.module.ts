@@ -213,7 +213,7 @@ export function useTrip(id?: string) {
 
 export function useLastTrip() {
   return useQuery({
-    queryKey: [queryKeys.trips, "last"],
+    queryKey: [...queryKeys.trips, "last"],
     queryFn: () => service.getLastTrip(),
   });
 }
@@ -232,17 +232,8 @@ export function useCreateTrip() {
     mutationFn: (data: CreateTrip) => service.create(data),
 
     onSuccess() {
-      qc.invalidateQueries({
-        predicate(query) {
-          return query.queryKey.includes(queryKeys.trips);
-        },
-      });
-
-      qc.invalidateQueries({
-        predicate(query) {
-          return query.queryKey.includes(queryKeys.reports);
-        },
-      });
+      qc.invalidateQueries({ queryKey: queryKeys.trips });
+      qc.invalidateQueries({ queryKey: queryKeys.reports });
     },
   });
 }
@@ -266,20 +257,10 @@ export function useUpdateTrip() {
       variables,
     ) {
       qc.invalidateQueries({
-        predicate(query) {
-          return query.queryKey.includes(queryKeys.trips);
-        },
-      });
-
-      qc.invalidateQueries({
         queryKey: queryKeys.trip(variables.id),
       });
-
-      qc.invalidateQueries({
-        predicate(query) {
-          return query.queryKey.includes(queryKeys.reports);
-        },
-      });
+      qc.invalidateQueries({ queryKey: queryKeys.trips });
+      qc.invalidateQueries({ queryKey: queryKeys.reports });
     },
   });
 }
@@ -291,17 +272,8 @@ export function useDeleteTrip() {
     mutationFn: (id: string) => service.delete(id),
 
     onSuccess() {
-      qc.invalidateQueries({
-        predicate(query) {
-          return query.queryKey.includes(queryKeys.trips);
-        },
-      });
-
-      qc.invalidateQueries({
-        predicate(query) {
-          return query.queryKey.includes(queryKeys.reports);
-        },
-      });
+      qc.invalidateQueries({ queryKey: queryKeys.trips });
+      qc.invalidateQueries({ queryKey: queryKeys.reports });
     },
   });
 }
