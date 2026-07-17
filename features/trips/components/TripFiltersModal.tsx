@@ -18,6 +18,7 @@ type Props = {
   onApply(filters: TripFiltersValue): void;
 
   lockedDriverId?: string;
+  lockedVehicleId?: string;
 };
 
 export function TripFiltersModal({
@@ -28,7 +29,9 @@ export function TripFiltersModal({
   onClose,
 
   onApply,
+
   lockedDriverId,
+  lockedVehicleId,
 }: Props) {
   const { colors, spacing, radius } = useTheme();
 
@@ -88,14 +91,13 @@ export function TripFiltersModal({
           <TripFilters
             defaultValues={filters}
             lockedDriverId={lockedDriverId}
+            lockedVehicleId={lockedVehicleId}
             onApply={(value) => {
               onApply(value);
-
               onClose();
             }}
             onClear={() => {
-              onApply({});
-
+              onApply({ driverId: lockedDriverId, vehicleId: lockedVehicleId });
               onClose();
             }}
           />

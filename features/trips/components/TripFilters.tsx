@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/common/Button";
 import { DateField } from "@/components/form/DateField";
@@ -9,9 +9,11 @@ import { SelectField } from "@/components/form/SelectField";
 import { useTheme } from "@/hooks/use-theme";
 
 import { useDrivers } from "@/modules/drivers.module";
+import { useVehicles } from "@/modules/vehicles.module";
 
 export type TripFiltersValue = {
   driverId?: string;
+  vehicleId?: string;
 
   from?: Date;
 
@@ -26,6 +28,7 @@ type Props = {
   onClear?(): void;
 
   lockedDriverId?: string;
+  lockedVehicleId?: string;
 };
 
 export function TripFilters({
@@ -36,43 +39,27 @@ export function TripFilters({
   onClear,
 
   lockedDriverId,
+  lockedVehicleId,
 }: Props) {
   const { spacing } = useTheme();
 
   const { data: drivers = [] } = useDrivers();
+  const { data: vehicles = [] } = useVehicles();
 
   const form = useForm<TripFiltersValue>({
     defaultValues: {
       ...defaultValues,
       driverId: lockedDriverId ?? defaultValues?.driverId,
+      vehicleId: lockedVehicleId ?? defaultValues?.vehicleId,
     },
   });
 
-  const driverId = useWatch({
-    control: form.control,
-
-    name: "driverId",
-  });
-
-  const from = useWatch({
-    control: form.control,
-
-    name: "from",
-  });
-
-  const to = useWatch({
-    control: form.control,
-
-    name: "to",
-  });
-
   function submit() {
+    const values = form.getValues();
     onApply({
-      driverId: driverId || undefined,
-
-      from,
-
-      to,
+      ...values,
+      driverId: lockedDriverId ?? values.driverId,
+      vehicleId: lockedVehicleId ?? values.vehicleId,
     });
   }
 
@@ -88,6 +75,18 @@ export function TripFilters({
           label: driver.name,
 
           value: driver.id,
+        }))}
+      />
+
+      <SelectField
+        disabled={!!lockedVehicleId}
+        control={form.control}
+        name="vehicleId"
+        label="Vehicle"
+        placeholder="All vehicles"
+        options={vehicles.map((vehicle) => ({
+          label: vehicle.name,
+          value: vehicle.id,
         }))}
       />
 
@@ -130,6 +129,7 @@ export function TripFilters({
           onPress={() => {
             form.reset({
               driverId: lockedDriverId ?? "",
+              vehicleId: lockedVehicleId ?? "",
               from: undefined,
               to: undefined,
             });

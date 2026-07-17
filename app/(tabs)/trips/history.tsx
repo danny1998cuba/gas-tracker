@@ -19,12 +19,18 @@ import { Funnel } from "lucide-react-native";
 export default function TripHistoryScreen() {
   const params = useLocalSearchParams<{
     driverId?: string;
+    vehicleId?: string;
+    from?: string;
+    to?: string;
     returnTo?: RelativePathString;
   }>();
 
   const { spacing } = useTheme();
   const [filters, setFilters] = useState<TripFiltersValue>({
     driverId: params.driverId,
+    vehicleId: params.vehicleId,
+    from: params.from ? new Date(params.from) : undefined,
+    to: params.to ? new Date(params.to) : undefined,
   });
 
   const [open, setOpen] = useState(false);
@@ -95,6 +101,7 @@ export default function TripHistoryScreen() {
         onClose={() => setOpen(false)}
         onApply={setFilters}
         lockedDriverId={params.driverId}
+        lockedVehicleId={params.vehicleId}
       />
     </>
   );

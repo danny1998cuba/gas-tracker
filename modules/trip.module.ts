@@ -35,6 +35,7 @@ export type TripsSummary = {
 
 export type TripFilters = {
   driverId?: string;
+  vehicleId?: string;
   from?: Date;
   to?: Date;
   limit?: number;
@@ -63,12 +64,16 @@ function enrichTrip(trip: NonNullable<TripEntity>) {
   };
 }
 
-const repository = {
+export const repository = {
   findAll(filters?: TripFilters) {
     const conditions: SQL[] = [];
 
     if (filters?.driverId) {
       conditions.push(eq(trips.driverId, filters.driverId));
+    }
+
+    if (filters?.vehicleId) {
+      conditions.push(eq(trips.vehicleId, filters.vehicleId));
     }
 
     if (filters?.from) {
